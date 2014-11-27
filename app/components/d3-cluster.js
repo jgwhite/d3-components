@@ -1,9 +1,26 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  renderCluster: function() {
-    var root = this.get('root');
+  setup: function() {
     var element = this.get('element');
+
+    var width = this.get('width'),
+        height = this.get('height');
+
+    var svg = d3.select(element).append("svg")
+        .attr("width", width)
+        .attr("height", height)
+      .append("g")
+        .attr("transform", "translate(40,0)");
+
+    this.set('svg', svg);
+
+    this.renderCluster();
+  }.on('didInsertElement'),
+
+  renderCluster: function() {
+    var root = Ember.copy(this.get('root'));
+    var svg = this.get('svg');
 
     var width = this.get('width'),
         height = this.get('height');
@@ -13,12 +30,6 @@ export default Ember.Component.extend({
 
     var diagonal = d3.svg.diagonal()
         .projection(function(d) { return [d.y, d.x]; });
-
-    var svg = d3.select(element).append("svg")
-        .attr("width", width)
-        .attr("height", height)
-      .append("g")
-        .attr("transform", "translate(40,0)");
 
     var nodes = cluster.nodes(root),
         links = cluster.links(nodes);
@@ -45,5 +56,5 @@ export default Ember.Component.extend({
         .attr("dy", 3)
         .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
         .text(function(d) { return d.name; });
-  }.on('didInsertElement')
+  }.observes('root.children.@each')
 });

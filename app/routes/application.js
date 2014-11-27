@@ -16,5 +16,16 @@ export default Ember.Route.extend({
         }
       };
     });
+  },
+
+  actions: {
+    addNode: function() {
+      var newNodeName = this.get('contoller.newNodeName');
+      var model = this.get('currentModel');
+      this.set('controller.newNodeName', null);
+      model.simple.children.addObject({
+        name: newNodeName
+      });
+    }
   }
 });

@@ -1,60 +1,33 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  setup: function() {
-    var element = this.get('element');
-
+  cluster: function() {
     var width = this.get('width'),
         height = this.get('height');
 
-    var svg = d3.select(element).append("svg")
-        .attr("width", width)
-        .attr("height", height)
-      .append("g")
-        .attr("transform", "translate(40,0)");
+    return d3.layout.cluster().size([height, width - 160]);
+  }.property('width', 'height'),
 
-    this.set('svg', svg);
+  nodes: function() {
+    var cluster = this.get('cluster');
+    var root = this.get('root');
 
-    this.renderCluster();
-  }.on('didInsertElement'),
+    return cluster.nodes(root);
+  }.property('root', 'cluster'),
 
-  renderCluster: function() {
-    var root = Ember.copy(this.get('root'));
-    var svg = this.get('svg');
-
-    var width = this.get('width'),
-        height = this.get('height');
-
-    var cluster = d3.layout.cluster()
-        .size([height, width - 160]);
+  links: function() {
+    var cluster = this.get('cluster');
+    var nodes = this.get('nodes');
 
     var diagonal = d3.svg.diagonal()
         .projection(function(d) { return [d.y, d.x]; });
 
-    var nodes = cluster.nodes(root),
-        links = cluster.links(nodes);
+    var links = cluster.links(nodes);
 
-    var link = svg.selectAll(".link")
-        .data(links)
-      .enter().append("path")
-        .attr("class", "link")
-        .attr("d", diagonal);
+    links.forEach(function(link) {
+      link.d = diagonal(link);
+    });
 
-    var node = svg.selectAll(".node")
-        .data(nodes)
-      .enter().append("g")
-        .attr("class", "node")
-        .attr("transform", function(d) {
-          return "translate(" + d.y + "," + d.x + ")";
-        })
-
-    node.append("circle")
-        .attr("r", 4.5);
-
-    node.append("text")
-        .attr("dx", function(d) { return d.children ? -8 : 8; })
-        .attr("dy", 3)
-        .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
-        .text(function(d) { return d.name; });
-  }.observes('root.children.@each')
+    return links;
+  }.property('cluster', 'nodes')
 });

@@ -1,8 +1,13 @@
 import Ember from 'ember';
+import Immutable from '../models/immutable';
 
 var WIDTH_ADJUSTER = 160;
 
 export default Ember.Component.extend({
+  root: function() {
+    return new Immutable(this.get('data.hashFormat'));
+  }.property('data.hashFormat'),
+
   cluster: function() {
     var width = this.get('width'),
         height = this.get('height');

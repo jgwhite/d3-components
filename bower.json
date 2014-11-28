@@ -13,7 +13,8 @@
     "ember-qunit": "0.1.8",
     "ember-qunit-notifications": "0.0.4",
     "qunit": "~1.15.0",
-    "d3": "~3.4.13"
+    "d3": "~3.4.13",
+    "ancient-oak": "~0.3.4"
   },
   "resolutions": {
     "handlebars": "~2.0.0",

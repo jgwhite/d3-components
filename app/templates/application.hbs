@@ -1,17 +1,19 @@
-<div>
+<p>
   <label>
     Width:
     {{input type="range" value=width min=100 max=1000}}
     {{width}}
   </label>
-</div>
-
-<div>
+  <br>
   <label>
     Height:
     {{input type="range" value=height min=100 max=1000}}
     {{height}}
   </label>
-</div>
+</p>
+
+<p>
+  {{input placeholder="New node…" value=newNodeName action="addNode"}}
+</p>
 
 {{d3-cluster root=model.root width=width height=height}}

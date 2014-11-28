@@ -1,14 +1,15 @@
 <svg width={{width}} height={{height}}>
   <g style="transform: translate(40px, 0);">
 
+    {{#each links as |link|}}
+      <path class="link" d={{link.d}}></path>
+    {{/each}}
+
     {{#each nodes as |node|}}
       <g class="node" style="transform: translate({{node.y}}px, {{node.x}}px);">
         <circle r="4.5"></circle>
+        <text x="-3" y="-10">{{node.name}}</text>
       </g>
-    {{/each}}
-
-    {{#each links as |link|}}
-      <path class="link" d={{link.d}}></path>
     {{/each}}
 
   </g>

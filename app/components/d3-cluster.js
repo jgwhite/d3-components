@@ -1,9 +1,8 @@
 import Ember from 'ember';
-import Immutable from '../models/immutable';
 
 export default Ember.Component.extend({
   root: function() {
-    return new Immutable(this.get('data.hashFormat'));
+    return this.get('data.hashFormat');
   }.property('data.hashFormat'),
 
   setup: function() {

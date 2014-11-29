@@ -1,42 +1,70 @@
 import Ember from 'ember';
 import Immutable from '../models/immutable';
 
-var WIDTH_ADJUSTER = 160;
-
 export default Ember.Component.extend({
   root: function() {
     return new Immutable(this.get('data.hashFormat'));
   }.property('data.hashFormat'),
 
-  cluster: function() {
+  setup: function() {
+    var element = this.get('element');
+
     var width = this.get('width'),
         height = this.get('height');
 
-    return d3.layout.cluster()
-      .size([height, width - WIDTH_ADJUSTER]);
-  }.property('width', 'height'),
+    var svg = d3.select(element).append("svg")
+        .attr("width", width)
+        .attr("height", height)
+      .append("g")
+        .attr("transform", "translate(40,0)");
 
-  nodes: function() {
-    var root = this.get('root');
-    root = Ember.copy(root, true);
-    var cluster = this.get('cluster');
+    this.set('svg', svg);
 
-    return cluster.nodes(root);
-  }.property('root', 'cluster'),
+    this.renderCluster();
+  }.on('didInsertElement'),
 
-  links: function() {
-    var nodes = this.get('nodes');
-    var cluster = this.get('cluster');
+  renderCluster: function() {
+    var root = Ember.copy(this.get('root'));
+    var svg = this.get('svg');
+
+    var width = this.get('width'),
+        height = this.get('height');
+
+    var cluster = d3.layout.cluster()
+        .size([height, width - 160]);
 
     var diagonal = d3.svg.diagonal()
         .projection(function(d) { return [d.y, d.x]; });
 
-    var links = cluster.links(nodes);
+    var nodes = cluster.nodes(root),
+        links = cluster.links(nodes);
 
-    links.forEach(function(link) {
-      link.d = diagonal(link);
-    });
+    var link = svg.selectAll(".link")
+        .data(links)
+        .attr("d", diagonal)
+      .enter().append("path")
+        .attr("class", "link")
+        .attr("d", diagonal);
 
-    return links;
-  }.property('nodes', 'cluster')
+    var node = svg.selectAll(".node")
+        .data(nodes)
+        .attr("transform", function(d) {
+          return "translate(" + d.y + "," + d.x + ")";
+        })
+      .enter().append("g")
+        .attr("class", "node")
+        .attr("transform", function(d) {
+          return "translate(" + d.y + "," + d.x + ")";
+        });
+
+    node.append("circle")
+        .attr("r", 4.5);
+
+    node.append("text")
+        .attr("dx", function(d) { return d.children ? -8 : 8; })
+        .attr("dy", 3)
+        .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+        .text(function(d) { return d.name; });
+  }.observes('root.children.@each')
 });
+

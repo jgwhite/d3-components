@@ -30,7 +30,7 @@ export default Ember.Route.extend({
       var children = model.get('children');
       var newChild = this.store.createRecord('node', {name: name});
       children.pushObject(newChild);
-      this.set('controller.model', model);
+      //this.set('controller.model', model);
       this.set('controller.newNodeName', null);
     }
   }
